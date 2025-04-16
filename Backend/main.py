@@ -1,9 +1,19 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import uuid
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # React's default port
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # In-memory database
 db = []
@@ -58,3 +68,12 @@ def get_listing(listing_id: str):
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
     return listing
+
+@app.delete("/listings/{listing_id}")
+def delete_listing(listing_id: str):
+    global db
+    listing = get_listing_by_id(listing_id)
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    db = [l for l in db if l["id"] != listing_id]
+    return {"message": "Listing deleted successfully"}

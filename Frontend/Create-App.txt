@@ -1,0 +1,2 @@
+npx create-react-app frontend --template typescript
+run in vscode/terminal
